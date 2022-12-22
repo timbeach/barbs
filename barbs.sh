@@ -4,14 +4,15 @@
 # by tanklinux.com
 # License: GNU GPLv3
 
-### OPTIONS AND VARIABLES ###
+# Options & variables
 
 dotfilesrepo="https://github.com/timbeach/gohan.git"
-progsfile="progs.csv"
+progsfile="tanklinux.com/progs.csv"
+# progsfile="/root/progs.csv"
 aurhelper="yay"
 repobranch="main"
 
-### FUNCTIONS ###
+# Functions
 
 installpkg() {
 	pacman --noconfirm --needed -S "$1" >/dev/null 2>&1
@@ -24,17 +25,17 @@ error() {
 }
 
 welcomemsg() {
-	whiptail --title "Welcome!" \
-		--msgbox "Welcome to BEACH Auto-Rice Bootstrapping Script!\\n\\nThis script will automatically install a fully-featured Linux desktop, which I use as my main machine.\\n\\n-TANKLINUX.COM" 10 60
+	whiptail --title "TANKLINUX.COM" \
+		--msgbox "Welcome to the BEACH Auto-Rice Bootstrapping Script!\\n\\nIf you made it this from tl.sh, then GNU/Linux is installed on top of a auto-snapshot-able btrfs filesystem. Now let's run BARBS to set up a graphical environment.\\n\\n-TANKLINUX.COM" 20 60
 
-	whiptail --title "Important Note!" --yes-button "All ready!" \
-		--no-button "Return..." \
-		--yesno "Be sure the computer you are using has current pacman updates and refreshed Arch or Artix keyrings.\\n\\nIf it does not, the installation of some programs might fail." 8 70
+	# whiptail --title "Important Note!" --yes-button "All ready!" \
+	# 	--no-button "Return..." \
+	# 	--yesno "Be sure the computer you are using has current pacman updates and refreshed Arch or Artix keyrings.\\n\\nIf it does not, the installation of some programs might fail." 8 70
 }
 
 getuserandpass() {
 	# Prompts user for new username an password.
-	name=$(whiptail --inputbox "First, please enter a name for the user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
+	name=$(whiptail --inputbox "Enter a username to login to the system as." 10 60 3>&1 1>&2 2>&3 3>&1) || exit 1
 	while ! echo "$name" | grep -q "^[a-z_][a-z0-9_-]*$"; do
 		name=$(whiptail --nocancel --inputbox "Username not valid. Give a username beginning with a letter, with only lowercase letters, - or _." 10 60 3>&1 1>&2 2>&3 3>&1)
 	done
@@ -51,13 +52,13 @@ usercheck() {
 	! { id -u "$name" >/dev/null 2>&1; } ||
 		whiptail --title "WARNING" --yes-button "CONTINUE" \
 			--no-button "No wait..." \
-			--yesno "The user \`$name\` already exists on this system. BARBS can install for a user already existing, but it will OVERWRITE any conflicting settings/dotfiles on the user account.\\n\\nBARBS will NOT overwrite your user files, documents, videos, etc., so don't worry about that, but only click <CONTINUE> if you don't mind your settings being overwritten.\\n\\nNote also that BARBS will change $name's password to the one you just gave." 14 70
+			--yesno "The user \`$name\` already exists on this system. BARBS can install for a user already existing, but it will OVERWRITE any conflicting settings/dotfiles for the user you targeted.\\n\\nBARBS will NOT overwrite your user personal files like Documents, Videos, etc., so only click <CONTINUE> if you don't mind your dot-file-type settings being overwritten.\\n\\User $name's password will also be updated to what you just entered." 14 70
 }
 
 preinstallmsg() {
-	whiptail --title "Let's get this party started!" --yes-button "Let's go!" \
-		--no-button "No, nevermind!" \
-		--yesno "The rest of the installation will now be totally automated, so you can sit back and relax.\\n\\nIt will take some time, but when done, you can relax even more with your complete system.\\n\\nNow just press <Let's go!> and the system will begin installation!" 13 60 || {
+	whiptail --title "Ready?" --yes-button "Let's go!" \
+		--no-button "No. Cancel BARBS!" \
+		--yesno "If you're ready for the BARBS automated install routine, select <Let's go!>\\n\\nI'm going to take this opportunity to stretch a bit. Maybe get a cuppa." 13 60 || {
 		clear
 		exit 1
 	}
@@ -161,7 +162,7 @@ pipinstall() {
 }
 
 installationloop() {
-	([ -f "$progsfile" ] && cp "$progsfile" /tmp/progs.csv) ||
+	(test -f "$progsfile" && cp "$progsfile" /tmp/progs.csv) ||
 		curl -Ls "$progsfile" | sed '/^#/d' >/tmp/progs.csv
 	total=$(wc -l </tmp/progs.csv)
 	aurinstalled=$(pacman -Qqm)
@@ -205,7 +206,8 @@ finalize() {
 		--msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1).\\n\\nIf you're following the vanilla, not-luks version, type exit twice, then \"shutdown -h now\", remove the installation USB, reboot the machine, enjoy.\\n\\n -TANKLINUX.COM" 13 80
 }
 
-### THE ACTUAL SCRIPT ###
+#####################################
+#####################################
 
 ### This is how everything happens in an intuitive format and order.
 
